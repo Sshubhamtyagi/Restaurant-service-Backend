@@ -202,7 +202,7 @@ res.end("post operation not supported" +req.params.commentId);
     {
       if(req.body.rating) {
 
-        dish.comments.id(req.params.commentId).rating =req.body.rating;
+        dish.comments.id(req.params.commentId).rating = req.body.rating;
       }
 
       if(req.body.comment)  {
