@@ -1,4 +1,4 @@
-require('dotenv').config();
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -7,24 +7,26 @@ var logger = require('morgan');
 var passport = require('passport');
 var authenticate = require('./auth');
 var config = require('./config');
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var dishRouter = require('./routes/dishRouter');
-var promoRouter = require('./routes/promoRouter');
-var leaderRouter = require('./routes/leaderRouter');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 
 const mongoose =require('mongoose');
-const Dishes = require('./models/dishes');
 
 const url = config.mongoUrl;
 const connect =mongoose.connect(url);
+
 connect.then((db)=>{
   console.log("connected to server");
 },(err)=>{
   console.log(err);
 });
+const Dishes = require('./models/dishes');
+const User = require('./models/user');
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+var dishRouter = require('./routes/dishRouter');
+var promoRouter = require('./routes/promoRouter');
+var leaderRouter = require('./routes/leaderRouter');
 
 var app = express();
 
