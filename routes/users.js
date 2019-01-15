@@ -1,7 +1,7 @@
 var express = require('express');
 const bodyParser = require('body-parser');
 var User = require('../models/user');
-var authenticate = require('../authenticate')
+var authenticate = require('../auth')
 var router = express.Router();
 var passport = require('passport')
 router.use(bodyParser.json());
@@ -33,7 +33,7 @@ var token = authenticate.getToken({_id: req.user._id});
   res.json({success : true,token: token, status:'Logged in'});
 })
 
-router.get('/logout', (req, res) => {
+router.get('/logout', (req, res,next) => {
   if (req.session) {
     req.session.destroy();
     res.clearCookie('session-id');
