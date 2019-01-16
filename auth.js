@@ -20,7 +20,7 @@ var opts ={
 // opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken('bearer');
 // opts.secretOrKey = config.secretKey;
 
- passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
+  passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
     User.findOne({_id: jwt_payload._id}, function(err, user) {
       User.findById(jwt_payload._id)
                     .then(user => {
@@ -34,3 +34,22 @@ var opts ={
     });
 }));
 exports.verifyUser = passport.authenticate('jwt', {session: false});
+exports.verifyAdmin = function(user){
+  return (req,res,next)=>{
+    console.log(req.user.admin)
+    if(req.user){
+  if( req.user.admin==true)
+  next();
+  else {
+    var err = new Error('You are not Admin!');
+    err.status = 403;
+    next(err);
+  }
+}
+else {
+  var err = new Error('You are not Admin!');
+  err.status = 403;
+  next(err);
+}
+  }
+};

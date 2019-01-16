@@ -22,7 +22,7 @@ dishRouter.route('/')
 })
 
 
-.post(authenticate.verifyUser,(req,res,next)=>{
+.post(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Dishes.create(req.body)
   .then((dish)=>{
     console.log('dish created');
@@ -33,12 +33,12 @@ dishRouter.route('/')
   .catch((err)=> next(err));
 })
 
-.put(authenticate.verifyUser,(req,res,next)=>{
+.put(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
     res.statusCode = 403;
     res.end("put operation not supported");
 })
 
-.delete(authenticate.verifyUser,(req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Dishes.remove({})
   .then((resp)=>{
     res.statusCode =200;
@@ -63,11 +63,11 @@ dishRouter.route('/:dishId')
 })
 
 
-.post(authenticate.verifyUser,(req,res,next)=>{res.statusCode = 403;
+.post(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{res.statusCode = 403;
 res.end("post operation not supported" +req.params.dishId);
 })
 
-.put(authenticate.verifyUser,(req,res,next)=>{
+.put(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Dishes.findByIdAndUpdate(req.params.dishId,{
     $set : req.body
   },{new : true})
@@ -81,7 +81,7 @@ res.end("post operation not supported" +req.params.dishId);
 })
 
 
-.delete((req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Dishes.findByIdAndRemove(req.params.dishId)
   .then((resp)=>{
     res.statusCode =200;
@@ -147,7 +147,7 @@ dishRouter.route('/:dishId/comments')
     res.end("put operation not supported" + req.params.dishId + '/comments');
 })
 
-.delete(authenticate.verifyUser,(req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Dishes.findById(req.params.dishId)
   .then((dish)=>{
     if(dish!= null)
@@ -207,11 +207,21 @@ res.end("post operation not supported" +req.params.commentId);
 .put(authenticate.verifyUser,(req,res,next)=>{
   Dishes.findById(req.params.dishId)
 .then((dish)=>{
+  //console.log(req.user.id + "    user id      authorid" + dish.comments.id(req.params.commentId).author + "  got it" );
+   if(req.user.id != dish.comments.id(req.params.commentId).author)
+   {
+     err = new Error('you can not update this comment');
+     err.status = 404;
+     return next(err);
+   }
+
   if(dish!= null && dish.comments.id(req.params.commentId)!=null)
   {
     if(dish!= null && dish.comments.id(req.params.commentId)!=null)
     {
+
       if(req.body.rating) {
+
 
         dish.comments.id(req.params.commentId).rating = req.body.rating;
       }
@@ -256,6 +266,12 @@ res.end("post operation not supported" +req.params.commentId);
 .delete(authenticate.verifyUser,(req,res,next)=>{
   Dishes.findById(req.params.dishId)
   .then((dish)=>{
+    if(req.user.id != dish.comments.id(req.params.commentId).author)
+    {
+      err = new Error('you can not delete this comment');
+      err.status = 404;
+      return next(err);
+    }
     if(dish!= null && dish.comments.id(req.params.commentId)!=null)
   {
 

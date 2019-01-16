@@ -21,7 +21,7 @@ promoRouter.route('/')
 
 })
 
-.post(authenticate.verifyUser,(req,res,next)=>{
+.post(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Promos.create(req.body)
   .then((promo)=>{
     console.log('promo created');
@@ -32,12 +32,12 @@ promoRouter.route('/')
   .catch((err)=> next(err));
 })
 
-.put(authenticate.verifyUser,(req,res,next)=>{
+.put(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
     res.statusCode = 403;
     res.end("put operation not supported");
 })
 
-.delete(authenticate.verifyUser,(req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Promos.remove({})
   .then((resp)=>{
     res.statusCode =200;
@@ -61,7 +61,7 @@ promoRouter.route('/:promoId')
 })
 
 
-.post(authenticate.verifyUser,(req,res,next)=>{res.statusCode = 403;
+.post(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{res.statusCode = 403;
 res.end("post operation not supported" +req.params.dishId);
 })
 
@@ -79,7 +79,7 @@ res.end("post operation not supported" +req.params.dishId);
 })
 
 
-.delete(authenticate.verifyUser,(req,res,next)=>{
+.delete(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Promos.findByIdAndRemove(req.params.promoId)
   .then((resp)=>{
     res.statusCode =200;
