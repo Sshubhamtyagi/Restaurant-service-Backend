@@ -1,4 +1,3 @@
-
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -20,6 +19,7 @@ connect.then((db)=>{
 },(err)=>{
   console.log(err);
 });
+
 const Dishes = require('./models/dishes');
 const User = require('./models/user');
 var indexRouter = require('./routes/index');
@@ -28,8 +28,10 @@ var dishRouter = require('./routes/dishRouter');
 var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var uploadRouter = require('./routes/uploadRouter');
-
+var favoriteRouter = require('./routes/favouriteRouter');
 var app = express();
+app.set("view engine" , "ejs");
+
 app.all('*',(req,res,next)=>{
   if(req.secure)
   return next();
@@ -63,7 +65,7 @@ app.use('/dishes',dishRouter);
 app.use('/promos',promoRouter);
 app.use('/leaders',leaderRouter);
 app.use('/imageUpload',uploadRouter);
-
+app.use('/favourites',favoriteRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

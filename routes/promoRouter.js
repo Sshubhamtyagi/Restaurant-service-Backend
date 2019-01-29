@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const authenticate = require('../auth');
-
+const cors = require('./cors');
 const Promos = require('../models/promotions');
 
 const promoRouter = express.Router();
@@ -10,7 +10,8 @@ const promoRouter = express.Router();
 promoRouter.use(bodyParser.json());
 
 promoRouter.route('/')
-.get((req,res,next)=>{
+.options(cors.corsWithOptions,(req,res)=>{res.sendStatus( 200);})
+.get(cors.cors,(req,res,next)=>{
   Promos.find({})
   .then((promos)=>{
     res.statusCode =200;
@@ -21,7 +22,7 @@ promoRouter.route('/')
 
 })
 
-.post(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
+.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Promos.create(req.body)
   .then((promo)=>{
     console.log('promo created');
@@ -32,12 +33,12 @@ promoRouter.route('/')
   .catch((err)=> next(err));
 })
 
-.put(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
+.put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
     res.statusCode = 403;
     res.end("put operation not supported");
 })
 
-.delete(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Promos.remove({})
   .then((resp)=>{
     res.statusCode =200;
@@ -49,7 +50,8 @@ promoRouter.route('/')
 
 
 promoRouter.route('/:promoId')
-.get((req,res,next)=>{
+.options(cors.corsWithOptions,(req,res)=>{res.sendStatus( 200);})
+.get(cors.cors,(req,res,next)=>{
   Promos.findById(req.params.promoId)
   .then((promo)=>{
     console.log('promo finded');
@@ -61,11 +63,11 @@ promoRouter.route('/:promoId')
 })
 
 
-.post(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{res.statusCode = 403;
+.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{res.statusCode = 403;
 res.end("post operation not supported" +req.params.dishId);
 })
 
-.put(authenticate.verifyUser,(req,res,next)=>{
+.put(cors.corsWithOptions,authenticate.verifyUser,(req,res,next)=>{
   Promos.findByIdAndUpdate(req.params.promoId,{
     $set : req.body
   },{new : true})
@@ -79,7 +81,7 @@ res.end("post operation not supported" +req.params.dishId);
 })
 
 
-.delete(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Promos.findByIdAndRemove(req.params.promoId)
   .then((resp)=>{
     res.statusCode =200;

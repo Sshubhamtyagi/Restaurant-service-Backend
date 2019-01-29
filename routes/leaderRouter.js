@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cors = require('./cors');
 const Leaders = require('../models/leaders');
 const authenticate = require('../auth');
 const leaderRouter = express.Router();
@@ -8,7 +9,8 @@ const leaderRouter = express.Router();
 leaderRouter.use(bodyParser.json());
 
 leaderRouter.route('/')
-.get((req,res,next)=>{
+.options(cors.corsWithOptions,(req,res)=>{res.sendStatus( 200);})
+.get(cors.cors,(req,res,next)=>{
   Leaders.find({})
   .then((leaders)=>{
     res.statusCode =200;
@@ -30,12 +32,12 @@ leaderRouter.route('/')
   .catch((err)=> next(err));
 })
 
-.put(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
+.put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
     res.statusCode = 403;
     res.end("put operation not supported");
 })
 
-.delete(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Leaders.remove({})
   .then((resp)=>{
     res.statusCode =200;
@@ -47,7 +49,8 @@ leaderRouter.route('/')
 
 
 leaderRouter.route('/:leaderId')
-.get((req,res,next)=>{
+.options(cors.corsWithOptions,(req,res)=>{res.sendStatus( 200);})
+.get(cors.cors,(req,res,next)=>{
   Leaders.findById(req.params.leaderId)
   .then((leader)=>{
     console.log('leader finded');
@@ -59,11 +62,11 @@ leaderRouter.route('/:leaderId')
 })
 
 
-.post(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{res.statusCode = 403;
+.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{res.statusCode = 403;
 res.end("post operation not supported" +req.params.dishId);
 })
 
-.put(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
+.put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Leaders.findByIdAndUpdate(req.params.leaderId,{
     $set : req.body
   },{new : true})
@@ -77,7 +80,7 @@ res.end("post operation not supported" +req.params.dishId);
 })
 
 
-.delete(authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin(),(req,res,next)=>{
   Leaders.findByIdAndRemove(req.params.leaderId)
   .then((resp)=>{
     res.statusCode =200;
